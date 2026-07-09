@@ -28,13 +28,25 @@ configureCloudinary();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
- const corsOptions = {
-        origin: 'http://localhost:5173', // Replace with your frontend URL later
-        credentials: true, // Allow cookies to be sent
-    };
-    app.use(cors(corsOptions));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://practicalsubmission-frontend.vercel.app",
+];
 
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+  })
+);
 // ------------------ Middleware Setup ------------------
 
 // 1. Body parser middleware (allows us to accept JSON data in the body)
