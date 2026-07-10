@@ -28,6 +28,8 @@ configureCloudinary();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+import cors from "cors";
+
 const allowedOrigins = [
   "http://localhost:5173",
   "https://practicalsubmission-frontend.vercel.app",
@@ -35,14 +37,14 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: function (origin, callback) {
+    origin: (origin, callback) => {
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
+      callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
   })
