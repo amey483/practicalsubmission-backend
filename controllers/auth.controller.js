@@ -116,7 +116,9 @@ const logout = (req, res) => {
         expires: new Date(0),
     });
 
-    res.status(200).json({ message: "Logged out successfully" });
+    res.status(200).json({
+        message: "Logged out successfully",
+    });
 };
 
 
