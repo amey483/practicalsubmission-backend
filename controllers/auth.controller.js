@@ -73,58 +73,21 @@ const signup = async (req, res) => {
     }
 };
 
-// @desc    Authenticate user & get token
-// @route   POST /api/auth/login
-// @access  Public
-const login = async (req, res) => {
-    const { email, password } = req.body;
-
-    // 1. Find user by email and explicitly select the password field
-    const user = await User.findOne({ email }).select('+password'); 
-
-    // 2. Check if user exists and password matches
-    if (user && (await user.matchPassword(password))) {
-        // 3. Generate JWT and set cookie
-        generateToken(res, user._id);
-
-        // 4. Send successful response (exclude the password field for the response)
-       res.json({
-    user: {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        collegeName: user.collegeName,
-    }
-});
-
-    } else {
-        res.status(401).json({ message: 'Invalid email or password.' });
-    }
-};
-
 // @desc    Logout user / clear cookie
 // @route   POST /api/auth/logout
 // @access  Private
 const logout = (req, res) => {
-    // Clear the JWT cookie
-    res.cookie('jwt', '', {
+    const isProduction = process.env.NODE_ENV === "production";
+
+    res.cookie("jwt", "", {
         httpOnly: true,
-        expires: new Date(0), // Set expiry to the past
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
+        expires: new Date(0),
     });
-    res.status(200).json({ message: 'Logged out successfully' });
+
+    res.status(200).json({ message: "Logged out successfully" });
 };
-
-const getMe = async (req, res) => {
-    if (!req.user) {
-        return res.status(401).json({ message: "Not authenticated" });
-    }
-
-    res.json({
-        user: req.user
-    });
-};
-
 
 export {
     signup,
