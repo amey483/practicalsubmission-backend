@@ -107,20 +107,17 @@ const login = async (req, res) => {
 // @route   POST /api/auth/logout
 // @access  Private
 const logout = (req, res) => {
-    const isProduction = process.env.NODE_ENV === "production";
-
     res.cookie("jwt", "", {
         httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? "none" : "lax",
+        secure: true,
+        sameSite: "none",
         expires: new Date(0),
     });
 
-    res.status(200).json({
-        message: "Logged out successfully",
+    res.json({
+        message: "Logout successful",
     });
 };
-
 
 const getMe = async (req, res) => {
     if (!req.user) {

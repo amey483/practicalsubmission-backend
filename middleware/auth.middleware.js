@@ -3,39 +3,43 @@ import User from '../models/User.model.js';
 
 // Middleware to verify JWT and protect routes
 const protect = async (req, res, next) => {
-    let token;
 
-    // 1. Check for the JWT cookie
-    if (req.cookies.jwt) {
-        token = req.cookies.jwt;
-    }
+    console.log("Cookies =>", req.cookies);
+
+    let token = req.cookies.jwt;
+
+    console.log("Token =>", token);
 
     if (!token) {
-        // If no token is found in the cookie
-        return res.status(401).json({ message: 'Not authorized, no token provided.' });
+        return res.status(401).json({
+            message: "Not authorized, no token provided."
+        });
     }
 
     try {
-        // 2. Verify the token using the JWT_SECRET
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // 3. Find the user associated with the token ID
-        // We select all fields EXCEPT the password.
-        const user = await User.findById(decoded.id).select('-password');
+        console.log("Decoded =>", decoded);
 
-        if (!user) {
-            return res.status(401).json({ message: 'Not authorized, user not found.' });
-        }
+        const user = await User.findById(decoded.id).select("-password");
 
-        // 4. Attach the user object to the request for use in controllers (e.g., req.user._id)
+        console.log("User =>", user);
+
         req.user = user;
-        
-        // Move to the next middleware or route controller
+
         next();
-    } catch (error) {
-        console.error(error);
-        return res.status(401).json({ message: 'Not authorized, token failed.' });
+
+    } catch (err) {
+
+        console.log(err);
+
+        res.status(401).json({
+            message: "Token failed"
+        });
+
     }
+
 };
 
 // Middleware for Role-Based Access Control (RBAC)
